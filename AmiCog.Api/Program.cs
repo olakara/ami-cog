@@ -1,5 +1,4 @@
 using AmiCog.Application;
-using AmiCog.Application.Services.Authentication;
 using AmiCog.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
