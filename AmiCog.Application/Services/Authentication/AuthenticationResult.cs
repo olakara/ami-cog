@@ -1,8 +1,7 @@
-﻿namespace AmiCog.Application.Services.Authentication;
+﻿using AmiCog.Domain.Entities;
+
+namespace AmiCog.Application.Services.Authentication;
 
 public record AuthenticationResult(
-    Guid Id,
-    string FirstName,
-    string LastName,
-    string Email,
+    User user,
     string Token);

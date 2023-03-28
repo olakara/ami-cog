@@ -27,8 +27,8 @@ namespace AmiCog.Api.Controllers
                 request.Email,
                 request.Password);
 
-            var response = new AuthenticationResponse(result.Id, result.FirstName,
-                                                        result.LastName, result.Email,
+            var response = new AuthenticationResponse(result.user.Id, result.user.FirstName,
+                                                        result.user.LastName, result.user.Email,
                                                         result.Token);
             return Ok(response);
         }
@@ -38,8 +38,8 @@ namespace AmiCog.Api.Controllers
         {
             var result = _authenticationService.Login(request.Email, request.Password);
             
-            var response = new AuthenticationResponse(result.Id, result.FirstName,
-                result.LastName, result.Email,
+            var response = new AuthenticationResponse(result.user.Id, result.user.FirstName,
+                result.user.LastName, result.user.Email,
                 result.Token);
             
             return Ok(response);
