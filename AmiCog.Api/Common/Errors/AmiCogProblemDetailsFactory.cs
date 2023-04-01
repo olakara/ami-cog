@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
 
-namespace AmiCog.Api.Errors;
+namespace AmiCog.Api.Common.Errors;
 
 public class AmiCogProblemDetailsFactory : ProblemDetailsFactory
 {
@@ -87,6 +87,6 @@ public class AmiCogProblemDetailsFactory : ProblemDetailsFactory
         
         problemDetails.Extensions.Add("customProperty", "customValue");
 
-        _configure?.Invoke(new() { HttpContext = httpContext!, ProblemDetails = problemDetails });
+        //_configure?.Invoke(new() { HttpContext = httpContext!, ProblemDetails = problemDetails });
     }
 }

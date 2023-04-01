@@ -1,4 +1,5 @@
-﻿using AmiCog.Application.Common.Interfaces.Authentication;
+﻿using AmiCog.Application.Common.Errors;
+using AmiCog.Application.Common.Interfaces.Authentication;
 using AmiCog.Application.Common.Interfaces.Persistence;
 using AmiCog.Domain.Entities;
 
@@ -18,7 +19,7 @@ public class AuthenticationService : IAuthenticationService
     {
         if (_userRepository.GetUserByEmail(email) is not User user)
         {
-            throw new Exception("User not registered with this email!");
+            throw new DuplicateEmailException();
         }
 
         if (user.Password != password)
@@ -37,7 +38,7 @@ public class AuthenticationService : IAuthenticationService
         // Check if the user already exists
         if (_userRepository.GetUserByEmail(email) is not null)
         {
-            throw new Exception("User with given email already exists!");
+            throw new DuplicateEmailException();
         }
         
         // create user ( generate unique id )

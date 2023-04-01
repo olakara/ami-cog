@@ -1,4 +1,4 @@
-using AmiCog.Api.Errors;
+using AmiCog.Api.Common.Errors;
 using AmiCog.Application;
 using AmiCog.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
