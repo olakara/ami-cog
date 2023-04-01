@@ -27,15 +27,19 @@ namespace AmiCog.Api.Controllers
                 request.Email,
                 request.Password);
 
-            if (!registerResult.IsT0)
-                return Problem(statusCode: StatusCodes.Status409Conflict, title: "Email already exists!");
-            
-            var result = registerResult.AsT0;
-            var response = new AuthenticationResponse(result.user.Id, result.user.FirstName,
-                result.user.LastName, result.user.Email,
+            return registerResult.Match(
+                result => Ok(MapAuthResult(result)),
+                _ => Problem(statusCode: StatusCodes.Status409Conflict, title: "Email already exists!"));
+        }
+
+        private AuthenticationResponse MapAuthResult(AuthenticationResult result)
+        {
+            return new AuthenticationResponse(
+                result.user.Id, 
+                result.user.FirstName,
+                result.user.LastName,
+                result.user.Email,
                 result.Token);
-            
-            return Ok(response);
         }
 
         [HttpPost("login")]
