@@ -2,6 +2,7 @@
 using AmiCog.Application.Common.Interfaces.Authentication;
 using AmiCog.Application.Common.Interfaces.Persistence;
 using AmiCog.Domain.Entities;
+using OneOf;
 
 namespace AmiCog.Application.Services.Authentication;
 
@@ -33,12 +34,12 @@ public class AuthenticationService : IAuthenticationService
             token);
     }
 
-    public AuthenticationResult Register(string firstName, string lastName, string email, string password)
+    public OneOf<AuthenticationResult,DuplicateEmailError> Register(string firstName, string lastName, string email, string password)
     {
         // Check if the user already exists
         if (_userRepository.GetUserByEmail(email) is not null)
         {
-            throw new DuplicateEmailException();
+            return new DuplicateEmailError();
         }
         
         // create user ( generate unique id )

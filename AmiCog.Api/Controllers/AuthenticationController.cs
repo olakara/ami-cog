@@ -22,14 +22,19 @@ namespace AmiCog.Api.Controllers
         [HttpPost("register")]
         public IActionResult Register(RegisterRequest request)
         {
-            var result = _authenticationService.Register(request.FirstName,
+            var registerResult = _authenticationService.Register(request.FirstName,
                 request.LastName, 
                 request.Email,
                 request.Password);
 
+            if (!registerResult.IsT0)
+                return Problem(statusCode: StatusCodes.Status409Conflict, title: "Email already exists!");
+            
+            var result = registerResult.AsT0;
             var response = new AuthenticationResponse(result.user.Id, result.user.FirstName,
-                                                        result.user.LastName, result.user.Email,
-                                                        result.Token);
+                result.user.LastName, result.user.Email,
+                result.Token);
+            
             return Ok(response);
         }
 
