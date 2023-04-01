@@ -1,9 +1,11 @@
 ﻿using System.Net;
+using FluentResults;
 
 namespace AmiCog.Application.Common.Errors;
 
 public class InvalidPasswordError : IError
 {
-    public HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
-    public string ErrorMessage => "Invalid Password!";
+    public string Message { get; }
+    public Dictionary<string, object> Metadata { get; }
+    public List<IError> Reasons { get; }
 }

@@ -2,7 +2,7 @@
 using AmiCog.Application.Common.Interfaces.Authentication;
 using AmiCog.Application.Common.Interfaces.Persistence;
 using AmiCog.Domain.Entities;
-using OneOf;
+using FluentResults;
 
 namespace AmiCog.Application.Services.Authentication;
 
@@ -16,16 +16,16 @@ public class AuthenticationService : IAuthenticationService
         _userRepository = userRepository;
     }
 
-    public OneOf<AuthenticationResult, IError> Login(string email, string password)
+    public Result<AuthenticationResult> Login(string email, string password)
     {
         if (_userRepository.GetUserByEmail(email) is not User user)
         {
-            return new UserNotExistsError();
+            return Result.Fail<AuthenticationResult>(new UserNotExistsError());
         }
 
         if (user.Password != password)
         {
-            return new InvalidPasswordError();
+            return Result.Fail<AuthenticationResult>(new InvalidPasswordError());
         }
 
         var token = _jwtTokenGenerator.GenerateToken(user.Id, user.FirstName, user.LastName);
@@ -34,12 +34,12 @@ public class AuthenticationService : IAuthenticationService
             token);
     }
 
-    public OneOf<AuthenticationResult, IError> Register(string firstName, string lastName, string email, string password)
+    public Result<AuthenticationResult> Register(string firstName, string lastName, string email, string password)
     {
         // Check if the user already exists
         if (_userRepository.GetUserByEmail(email) is not null)
         {
-            return new DuplicateEmailError();
+            return Result.Fail<AuthenticationResult>(new DuplicateEmailError());
         }
         
         // create user ( generate unique id )

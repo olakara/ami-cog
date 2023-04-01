@@ -29,11 +29,33 @@ namespace AmiCog.Api.Controllers
                 request.Email,
                 request.Password);
 
-            return registerResult.Match(
-                result => Ok(MapAuthResult(result)),
-                error => Problem(statusCode: (int)error.StatusCode, title: error.ErrorMessage));
+            if (registerResult.IsSuccess)
+            {
+                return Ok(MapAuthResult(registerResult.Value));
+            }
+
+            var firstError = registerResult.Errors[0];
+            if (firstError is DuplicateEmailError)
+            {
+                return Problem(statusCode: StatusCodes.Status409Conflict, title: "Email already exist!");
+            }
+
+            return Problem();
         }
 
+        [HttpPost("login")]
+        public IActionResult Login(LoginRequest request)
+        {
+            var result = _authenticationService.Login(request.Email, request.Password);
+            
+            if (result.IsSuccess)
+            {
+                return Ok(MapAuthResult(result.Value));
+            }
+            
+            return Problem();
+        }
+        
         private AuthenticationResponse MapAuthResult(AuthenticationResult result)
         {
             return new AuthenticationResponse(
@@ -42,16 +64,6 @@ namespace AmiCog.Api.Controllers
                 result.user.LastName,
                 result.user.Email,
                 result.Token);
-        }
-
-        [HttpPost("login")]
-        public IActionResult Login(LoginRequest request)
-        {
-            var result = _authenticationService.Login(request.Email, request.Password);
-            
-            return result.Match(
-                result => Ok(MapAuthResult(result)),
-                error => Problem(statusCode: (int)error.StatusCode, title: error.ErrorMessage));
         }
     }
 }
