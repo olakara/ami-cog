@@ -5,8 +5,8 @@ namespace AmiCog.Application.Services.Authentication;
 
 public interface IAuthenticationService
 {
-    public AuthenticationResult Login(string email, string password);
-    OneOf<AuthenticationResult, DuplicateEmailError> Register(string firstName,
+    public OneOf<AuthenticationResult, IError> Login(string email, string password);
+    OneOf<AuthenticationResult, IError> Register(string firstName,
         string lastName,
         string email,
         string password);

@@ -16,16 +16,16 @@ public class AuthenticationService : IAuthenticationService
         _userRepository = userRepository;
     }
 
-    public AuthenticationResult Login(string email, string password)
+    public OneOf<AuthenticationResult, IError> Login(string email, string password)
     {
         if (_userRepository.GetUserByEmail(email) is not User user)
         {
-            throw new DuplicateEmailException();
+            return new UserNotExistsError();
         }
 
         if (user.Password != password)
         {
-            throw new Exception("Invalid Password!");
+            return new InvalidPasswordError();
         }
 
         var token = _jwtTokenGenerator.GenerateToken(user.Id, user.FirstName, user.LastName);
@@ -34,7 +34,7 @@ public class AuthenticationService : IAuthenticationService
             token);
     }
 
-    public OneOf<AuthenticationResult,DuplicateEmailError> Register(string firstName, string lastName, string email, string password)
+    public OneOf<AuthenticationResult, IError> Register(string firstName, string lastName, string email, string password)
     {
         // Check if the user already exists
         if (_userRepository.GetUserByEmail(email) is not null)

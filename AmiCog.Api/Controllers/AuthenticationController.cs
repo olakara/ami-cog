@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AmiCog.Application.Common.Errors;
 using AmiCog.Application.Services.Authentication;
 using AmiCog.Contracts.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OneOf;
 
 namespace AmiCog.Api.Controllers
 {
@@ -19,17 +20,18 @@ namespace AmiCog.Api.Controllers
         {
             _authenticationService = authenticationService;
         }
+        
         [HttpPost("register")]
         public IActionResult Register(RegisterRequest request)
         {
-            var registerResult = _authenticationService.Register(request.FirstName,
+            var registerResult= _authenticationService.Register(request.FirstName,
                 request.LastName, 
                 request.Email,
                 request.Password);
 
             return registerResult.Match(
                 result => Ok(MapAuthResult(result)),
-                _ => Problem(statusCode: StatusCodes.Status409Conflict, title: "Email already exists!"));
+                error => Problem(statusCode: (int)error.StatusCode, title: error.ErrorMessage));
         }
 
         private AuthenticationResponse MapAuthResult(AuthenticationResult result)
@@ -47,11 +49,9 @@ namespace AmiCog.Api.Controllers
         {
             var result = _authenticationService.Login(request.Email, request.Password);
             
-            var response = new AuthenticationResponse(result.user.Id, result.user.FirstName,
-                result.user.LastName, result.user.Email,
-                result.Token);
-            
-            return Ok(response);
+            return result.Match(
+                result => Ok(MapAuthResult(result)),
+                error => Problem(statusCode: (int)error.StatusCode, title: error.ErrorMessage));
         }
     }
 }
