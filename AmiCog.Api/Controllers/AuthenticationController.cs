@@ -6,7 +6,7 @@ using AmiCog.Application.Common.Errors;
 using AmiCog.Application.Services.Authentication;
 using AmiCog.Contracts.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using OneOf;
+
 
 namespace AmiCog.Api.Controllers
 {
