@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AmiCog.Application.Common.Errors;
 using AmiCog.Application.Services.Authentication;
 using AmiCog.Contracts.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -11,8 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace AmiCog.Api.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
-    public class AuthenticationController : ControllerBase
+   
+    public class AuthenticationController : ApiController
     {
         private readonly IAuthenticationService _authenticationService;
 
@@ -29,31 +28,21 @@ namespace AmiCog.Api.Controllers
                 request.Email,
                 request.Password);
 
-            if (registerResult.IsSuccess)
-            {
-                return Ok(MapAuthResult(registerResult.Value));
-            }
-
-            var firstError = registerResult.Errors[0];
-            if (firstError is DuplicateEmailError)
-            {
-                return Problem(statusCode: StatusCodes.Status409Conflict, title: "Email already exist!");
-            }
-
-            return Problem();
+           return registerResult.Match(
+               result => Ok(MapAuthResult(result)),
+               errors =>  Problem(errors)
+                   );
         }
 
         [HttpPost("login")]
         public IActionResult Login(LoginRequest request)
         {
-            var result = _authenticationService.Login(request.Email, request.Password);
-            
-            if (result.IsSuccess)
-            {
-                return Ok(MapAuthResult(result.Value));
-            }
-            
-            return Problem();
+            var authResult = _authenticationService.Login(request.Email, request.Password);
+
+            return authResult.Match(
+                result => Ok(MapAuthResult(result)),
+                errors =>  Problem(errors)
+            );
         }
         
         private AuthenticationResponse MapAuthResult(AuthenticationResult result)
