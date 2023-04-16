@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AmiCog.Application.Services.Authentication;
+using AmiCog.Application.Services.Authentication.Commands;
+using AmiCog.Application.Services.Authentication.Common;
+using AmiCog.Application.Services.Authentication.Queries;
 using AmiCog.Contracts.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,17 +16,19 @@ namespace AmiCog.Api.Controllers
    
     public class AuthenticationController : ApiController
     {
-        private readonly IAuthenticationService _authenticationService;
+        private readonly IAuthenticationCommandService _authenticationCommandService;
+        private readonly IAuthenticationQueryService _authenticationQueryService;
 
-        public AuthenticationController(IAuthenticationService authenticationService)
+        public AuthenticationController(IAuthenticationCommandService authenticationCommandService, IAuthenticationQueryService authenticationQueryService)
         {
-            _authenticationService = authenticationService;
+            _authenticationCommandService = authenticationCommandService;
+            _authenticationQueryService = authenticationQueryService;
         }
         
         [HttpPost("register")]
         public IActionResult Register(RegisterRequest request)
         {
-            var registerResult= _authenticationService.Register(request.FirstName,
+            var registerResult= _authenticationCommandService.Register(request.FirstName,
                 request.LastName, 
                 request.Email,
                 request.Password);
@@ -37,7 +42,7 @@ namespace AmiCog.Api.Controllers
         [HttpPost("login")]
         public IActionResult Login(LoginRequest request)
         {
-            var authResult = _authenticationService.Login(request.Email, request.Password);
+            var authResult = _authenticationQueryService.Login(request.Email, request.Password);
 
             return authResult.Match(
                 result => Ok(MapAuthResult(result)),

@@ -1,6 +1,6 @@
 ﻿using AmiCog.Domain.Entities;
 
-namespace AmiCog.Application.Services.Authentication;
+namespace AmiCog.Application.Services.Authentication.Common;
 
 public record AuthenticationResult(
     User user,
