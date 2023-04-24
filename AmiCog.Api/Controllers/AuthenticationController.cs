@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AmiCog.Application.Services.Authentication;
-using AmiCog.Application.Services.Authentication.Commands;
-using AmiCog.Application.Services.Authentication.Common;
-using AmiCog.Application.Services.Authentication.Queries;
+using AmiCog.Application.Authentication.Commands.Register;
+using AmiCog.Application.Authentication.Common;
+using AmiCog.Application.Authentication.Queries.Login;
 using AmiCog.Contracts.Authentication;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -16,22 +16,21 @@ namespace AmiCog.Api.Controllers
    
     public class AuthenticationController : ApiController
     {
-        private readonly IAuthenticationCommandService _authenticationCommandService;
-        private readonly IAuthenticationQueryService _authenticationQueryService;
+        private readonly ISender _mediator;
 
-        public AuthenticationController(IAuthenticationCommandService authenticationCommandService, IAuthenticationQueryService authenticationQueryService)
+        public AuthenticationController( ISender mediator)
         {
-            _authenticationCommandService = authenticationCommandService;
-            _authenticationQueryService = authenticationQueryService;
+            _mediator = mediator;
         }
         
         [HttpPost("register")]
-        public IActionResult Register(RegisterRequest request)
+        public async Task<IActionResult> Register(RegisterRequest request)
         {
-            var registerResult= _authenticationCommandService.Register(request.FirstName,
+            var command = new RegisterCommand(request.FirstName,
                 request.LastName, 
                 request.Email,
                 request.Password);
+            var registerResult = await _mediator.Send(command);
 
            return registerResult.Match(
                result => Ok(MapAuthResult(result)),
@@ -40,9 +39,11 @@ namespace AmiCog.Api.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login(LoginRequest request)
+        public async Task<IActionResult> Login(LoginRequest request)
         {
-            var authResult = _authenticationQueryService.Login(request.Email, request.Password);
+            //var command = new Lo
+            var query = new LoginQuery(request.Email, request.Password);
+            var authResult = await _mediator.Send(query);
 
             return authResult.Match(
                 result => Ok(MapAuthResult(result)),

@@ -1,31 +1,32 @@
-﻿using AmiCog.Application.Common.Interfaces.Authentication;
+﻿using AmiCog.Application.Authentication.Common;
+using AmiCog.Application.Common.Interfaces.Authentication;
 using AmiCog.Application.Common.Interfaces.Persistence;
-using AmiCog.Application.Services.Authentication.Common;
 using AmiCog.Domain.Common.Errors;
 using AmiCog.Domain.Entities;
+using MediatR;
 using ErrorOr;
 
-namespace AmiCog.Application.Services.Authentication.Queries;
+namespace AmiCog.Application.Authentication.Queries.Login;
 
-public class AuthenticationQueryService : IAuthenticationQueryService
+public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<AuthenticationResult>>
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUserRepository _userRepository;
-    
-    public AuthenticationQueryService(IJwtTokenGenerator jwtTokenGenerator,IUserRepository userRepository)
+
+    public LoginQueryHandler(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
         _userRepository = userRepository;
     }
-    
-    public ErrorOr<AuthenticationResult> Login(string email, string password)
+
+    public async Task<ErrorOr<AuthenticationResult>> Handle(LoginQuery query, CancellationToken cancellationToken)
     {
-        if (_userRepository.GetUserByEmail(email) is not User user)
+        if (_userRepository.GetUserByEmail(query.Email) is not User user)
         {
             return Errors.Authentication.InvalidCredentials;
         }
         
-        if (user.Password != password)
+        if (user.Password != query.Password)
         {
             return new [] {Errors.Authentication.InvalidCredentials};
         }
