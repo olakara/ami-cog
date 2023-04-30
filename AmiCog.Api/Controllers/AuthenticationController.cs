@@ -8,13 +8,14 @@ using AmiCog.Application.Authentication.Queries.Login;
 using AmiCog.Contracts.Authentication;
 using MapsterMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace AmiCog.Api.Controllers
 {
-    [Route("api/[controller]")]
-   
+    
+    [AllowAnonymous]
     public class AuthenticationController : ApiController
     {
         private readonly ISender _mediator;

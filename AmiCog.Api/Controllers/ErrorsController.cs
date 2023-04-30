@@ -7,9 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AmiCog.Api.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ErrorsController : ControllerBase
+   public class ErrorsController : ControllerBase
     {
         [Route("/error")]
         public IActionResult Error()
